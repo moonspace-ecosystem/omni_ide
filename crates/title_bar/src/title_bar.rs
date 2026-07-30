@@ -9,7 +9,6 @@ use crate::application_menu::{ApplicationMenu, show_menus};
 use crate::plan_chip::PlanChip;
 use agent_settings::{AgentSettings, WindowLayout};
 use arrayvec::ArrayVec;
-use git_ui::worktree_picker::WorktreePicker;
 pub use platform_title_bar::{
     self, DraggedWindowTab, MergeAllWindows, MoveTabToNewWindow, PlatformTitleBar,
     ShowNextWindowTab, ShowPreviousWindowTab,
@@ -932,14 +931,7 @@ impl TitleBar {
             let project = self.project.clone();
             let workspace_handle = workspace.downgrade();
             PopoverMenu::new("worktree-picker-menu")
-                .menu(move |window, cx| {
-                    // When opened from the title bar, focus is on the trigger
-                    // button (not a dock), so `focused_dock` is `None`. That's
-                    // fine — there's no prior dock focus to restore.
-                    Some(cx.new(|cx| {
-                        WorktreePicker::new(project.clone(), workspace_handle.clone(), window, cx)
-                    }))
-                })
+                .menu(move |_, _| None)
                 .trigger_with_tooltip(
                     Button::new("worktree_picker_trigger", display_label)
                         .selected_style(ButtonStyle::Tinted(TintColor::Accent))
@@ -994,16 +986,7 @@ impl TitleBar {
                 };
 
                 PopoverMenu::new("branch-menu")
-                    .menu(move |window, cx| {
-                        Some(git_ui::git_picker::popover(
-                            workspace.downgrade(),
-                            effective_repository.clone(),
-                            git_ui::git_picker::GitPickerTab::Branches,
-                            gpui::rems(34.),
-                            window,
-                            cx,
-                        ))
-                    })
+                    .menu(move |_, _| None)
                     .trigger_with_tooltip(trigger, move |_window, cx| {
                         let meta = if is_detached_head {
                             format!("Detached HEAD: {}", branch_tooltip_label)
@@ -1034,6 +1017,16 @@ impl TitleBar {
                     )
                     .child(branch_picker)
                 })
+                .child(
+                    Button::new("gitbutler_toggle", "GitButler")
+                        .selected_style(ButtonStyle::Tinted(TintColor::Accent))
+                        .label_size(LabelSize::Small)
+                        .color(Color::Muted)
+                        .tooltip(move |cx| Tooltip::text("Toggle GitButler Panel", cx))
+                        .on_click(|_, window, cx| {
+                            window.dispatch_action(Box::new(gitbutler_panel::actions::ToggleGitButlerPanel), cx);
+                        })
+                )
                 .into_any_element(),
         )
     }

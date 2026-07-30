@@ -85,8 +85,10 @@ members = [
     "crates/fuzzy_nucleo",
     "crates/git",
     "crates/git_graph",
+    "crates/gitbutler_panel",
+    "crates/gitbutler_store",
+    "crates/gitbutler_bridge",
     "crates/git_hosting_providers",
-    "crates/git_ui",
     "crates/go_to_line",
     "crates/google_ai",
     "crates/grammars",
@@ -253,7 +255,7 @@ members = [
 
     "tooling/compliance",
     "tooling/perf",
-    "tooling/xtask",
+    "tooling/xtask", "crates/gitbutler_watcher",
 ]
 default-members = ["crates/zed"]
 
@@ -262,6 +264,30 @@ publish = false
 edition = "2024"
 
 [workspace.dependencies]
+gix = { git = "https://github.com/GitoxideLabs/gitoxide", rev = "575113dfb10b3ba12eb57f57a81b241e773968bd" }
+
+but-api = { path = "../gitbutler/crates/but-api" }
+but-core = { path = "../gitbutler/crates/but-core" }
+but-ctx = { path = "../gitbutler/crates/but-ctx" }
+but-db = { path = "../gitbutler/crates/but-db" }
+but-error = { path = "../gitbutler/crates/but-error" }
+but-forge = { path = "../gitbutler/crates/but-forge" }
+but-forge-storage = { path = "../gitbutler/crates/but-forge-storage" }
+but-github = { path = "../gitbutler/crates/but-github" }
+but-gitlab = { path = "../gitbutler/crates/but-gitlab" }
+but-graph = { path = "../gitbutler/crates/but-graph" }
+but-hunk-assignment = { path = "../gitbutler/crates/but-hunk-assignment" }
+but-hunk-dependency = { path = "../gitbutler/crates/but-hunk-dependency" }
+but-meta = { path = "../gitbutler/crates/but-meta" }
+but-oplog = { path = "../gitbutler/crates/but-oplog" }
+but-path = { path = "../gitbutler/crates/but-path" }
+but-rebase = { path = "../gitbutler/crates/but-rebase" }
+but-secret = { path = "../gitbutler/crates/but-secret" }
+but-serde = { path = "../gitbutler/crates/but-serde" }
+but-settings = { path = "../gitbutler/crates/but-settings" }
+but-utils = { path = "../gitbutler/crates/but-utils" }
+but-workspace = { path = "../gitbutler/crates/but-workspace" }
+but-api-macros = { path = "../gitbutler/crates/but-api-macros" }
 
 #
 # Workspace member crates
@@ -341,6 +367,9 @@ fuzzy = { path = "crates/fuzzy" }
 fuzzy_nucleo = { path = "crates/fuzzy_nucleo" }
 git = { path = "crates/git" }
 git_graph = { path = "crates/git_graph" }
+gitbutler_panel = { path = "crates/gitbutler_panel" }
+gitbutler_store = { path = "crates/gitbutler_store" }
+gitbutler_bridge = { path = "crates/gitbutler_bridge" }
 git_hosting_providers = { path = "crates/git_hosting_providers" }
 git_ui = { path = "crates/git_ui" }
 go_to_line = { path = "crates/go_to_line" }
@@ -881,6 +910,7 @@ features = [
 ]
 
 [patch.crates-io]
+gix = { git = "https://github.com/GitoxideLabs/gitoxide", rev = "575113dfb10b3ba12eb57f57a81b241e773968bd" }
 async-task = { git = "https://github.com/smol-rs/async-task.git", rev = "b4486cd71e4e94fbda54ce6302444de14f4d190e" }
 notify = { git = "https://github.com/zed-industries/notify.git", rev = "ce58c24cad542c28e04ced02e20325a4ec28a31d" }
 notify-types = { git = "https://github.com/zed-industries/notify.git", rev = "ce58c24cad542c28e04ced02e20325a4ec28a31d" }
@@ -1035,3 +1065,6 @@ ignored = [
     "documented",
     "sea-orm-macros",
 ]
+
+
+

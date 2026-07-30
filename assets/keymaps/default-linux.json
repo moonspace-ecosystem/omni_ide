@@ -127,7 +127,6 @@
       "ctrl-i": "editor::ShowSignatureHelp",
       "alt-g b": "git::Blame",
       "alt-g m": "git::OpenModifiedFiles",
-      "alt-g r": "git::ReviewDiff",
       "menu": "editor::OpenContextMenu",
       "shift-f10": "editor::OpenContextMenu",
       "ctrl-alt-shift-e": "editor::ToggleEditPrediction",
@@ -305,7 +304,6 @@
       "ctrl-alt-shift-pageup": "agent::ScrollOutputToPreviousMessage",
       "ctrl-alt-shift-pagedown": "agent::ScrollOutputToNextMessage",
       "ctrl-shift-r": "agent::OpenAgentDiff",
-      "ctrl-shift-d": "git::Diff",
       "shift-alt-y": "agent::KeepAll",
       "shift-alt-z": "agent::RejectAll",
       "shift-alt-u": "agent::UndoLastReject",
@@ -674,7 +672,6 @@
       "ctrl-shift-m": "diagnostics::Deploy",
       "ctrl-shift-e": "project_panel::ToggleFocus",
       "ctrl-shift-b": "outline_panel::ToggleFocus",
-      "ctrl-shift-g": "git_panel::ToggleFocus",
       "ctrl-shift-d": "debug_panel::ToggleFocus",
       "ctrl-?": "agent::ToggleFocus",
       "alt-save": "workspace::SaveAll",
@@ -982,26 +979,17 @@
   {
     "context": "GitPanel",
     "bindings": {
-      "ctrl-1": "git_panel::ActivateChangesTab",
-      "ctrl-2": "git_panel::ActivateHistoryTab",
     },
   },
   {
     "context": "GitPanel && ChangesList && !GitBranchSelector",
     "bindings": {
-      "left": "git_panel::CollapseSelectedEntry",
-      "right": "git_panel::ExpandSelectedEntry",
-      "up": "git_panel::PreviousEntry",
-      "down": "git_panel::NextEntry",
       "enter": "menu::Confirm",
       "alt-y": "git::StageFile",
       "alt-shift-y": "git::UnstageFile",
       "ctrl-alt-y": "git::ToggleStaged",
       "space": "git::ToggleStaged",
       "shift-space": "git::StageRange",
-      "tab": "git_panel::FocusEditor",
-      "shift-tab": "git_panel::FocusEditor",
-      "escape": "git_panel::ToggleFocus",
       "alt-enter": "menu::SecondaryConfirm",
       "delete": ["git::RestoreFile", { "skip_prompt": false }],
       "backspace": ["git::RestoreFile", { "skip_prompt": false }],
@@ -1035,7 +1023,6 @@
       "ctrl-g down": "git::Pull",
       "ctrl-g shift-down": "git::PullRebase",
       "ctrl-g shift-up": "git::ForcePush",
-      "ctrl-g d": "git::Diff",
       "ctrl-g backspace": "git::RestoreTrackedFiles",
       "ctrl-g shift-backspace": "git::TrashUntrackedFiles",
       "ctrl-space": "git::StageAll",
@@ -1063,13 +1050,9 @@
   {
     "context": "CommitEditor > Editor",
     "bindings": {
-      "escape": "git_panel::FocusChanges",
-      "tab": "git_panel::FocusChanges",
-      "shift-tab": "git_panel::FocusChanges",
       "enter": "editor::Newline",
       "ctrl-enter": "git::Commit",
       "ctrl-shift-enter": "git::Amend",
-      "alt-up": "git_panel::FocusChanges",
       "alt-l": "git::GenerateCommitMessage",
       "shift-escape": "git::ExpandCommitEditor",
       "alt-shift-escape": "git::ToggleFillCommitEditor",
@@ -1195,8 +1178,6 @@
   {
     "context": "StashList || (StashList > Picker > Editor)",
     "bindings": {
-      "ctrl-shift-backspace": "stash_picker::DropStashItem",
-      "ctrl-shift-v": "stash_picker::ShowStashItem",
     },
   },
   {
@@ -1434,9 +1415,6 @@
   {
     "context": "StashDiff > Editor",
     "bindings": {
-      "ctrl-space": "git::ApplyCurrentStash",
-      "ctrl-shift-space": "git::PopCurrentStash",
-      "ctrl-shift-backspace": "git::DropCurrentStash",
     },
   },
   {
@@ -1504,9 +1482,6 @@
     "context": "GitBranchSelector || (GitBranchSelector > Picker > Editor)",
     "use_key_equivalents": true,
     "bindings": {
-      "ctrl-shift-backspace": "branch_picker::DeleteBranch",
-      "ctrl-alt-shift-backspace": "branch_picker::ForceDeleteBranch",
-      "ctrl-shift-i": "branch_picker::FilterRemotes",
     },
   },
   {
@@ -1532,16 +1507,12 @@
   {
     "context": "GitPicker",
     "bindings": {
-      "alt-1": "git_picker::ActivateBranchesTab",
-      "alt-2": "git_picker::ActivateStashTab",
     },
   },
   {
     "context": "WorktreePicker || (WorktreePicker > Picker > Editor)",
     "use_key_equivalents": true,
     "bindings": {
-      "ctrl-shift-backspace": "worktree_picker::DeleteWorktree",
-      "ctrl-alt-shift-backspace": "worktree_picker::ForceDeleteWorktree",
     },
   },
   {

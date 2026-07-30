@@ -13,7 +13,6 @@ use futures::channel::{mpsc, oneshot};
 use futures::future;
 
 use futures::{FutureExt, StreamExt};
-use git_ui::{file_diff_view::FileDiffView, multi_diff_view::MultiDiffView};
 use gpui::{App, AsyncApp, Global, TaskExt, WindowHandle};
 use onboarding::FIRST_OPEN;
 use onboarding::show_onboarding_view;
@@ -482,50 +481,6 @@ pub async fn open_paths_with_positions(
     } = cx
         .update(|cx| workspace::open_paths(&paths, app_state.clone(), open_options, cx))
         .await?;
-
-    if diff_all && !diff_paths.is_empty() {
-        if let Ok(diff_view) = multi_workspace.update(cx, |multi_workspace, window, cx| {
-            multi_workspace.workspace().update(cx, |workspace, cx| {
-                MultiDiffView::open(diff_paths.to_vec(), workspace, window, cx)
-            })
-        }) {
-            if let Some(diff_view) = diff_view.await.log_err() {
-                items.push(Some(Ok(Box::new(diff_view))));
-            }
-        }
-    } else {
-        let workspace_weak = multi_workspace.read_with(cx, |multi_workspace, _cx| {
-            multi_workspace.workspace().downgrade()
-        })?;
-        let canonicalize = async |raw: &str| {
-            app_state
-                .fs
-                .canonicalize(Path::new(raw))
-                .await
-                .with_context(|| format!("opening --diff path {raw:?}"))
-        };
-        for diff_pair in diff_paths {
-            let (old_path, new_path) =
-                match futures::join!(canonicalize(&diff_pair[0]), canonicalize(&diff_pair[1])) {
-                    (Ok(old), Ok(new)) => (old, new),
-                    (old, new) => {
-                        for result in [old, new] {
-                            if let Err(err) = result {
-                                items.push(Some(Err(err)));
-                            }
-                        }
-                        continue;
-                    }
-                };
-            if let Ok(diff_view) = multi_workspace.update(cx, |_multi_workspace, window, cx| {
-                FileDiffView::open(old_path, new_path, workspace_weak.clone(), window, cx)
-            }) {
-                if let Some(diff_view) = diff_view.await.log_err() {
-                    items.push(Some(Ok(Box::new(diff_view))))
-                }
-            }
-        }
-    }
 
     for (item, path) in items.iter_mut().zip(&paths) {
         if let Some(Err(error)) = item {

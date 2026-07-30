@@ -9,7 +9,7 @@ use git::{
     },
     status::{FileStatus, StatusCode, TrackedStatus},
 };
-use git_ui::{commit_tooltip::CommitAvatar, commit_view::CommitView, git_status_icon};
+
 use gpui::{
     Action, Anchor, AnyElement, App, Bounds, ClickEvent, ClipboardItem, DefiniteLength,
     DismissEvent, DragMoveEvent, ElementId, Empty, Entity, EventEmitter, FocusHandle, Focusable,
@@ -244,13 +244,6 @@ impl ChangedFileEntry {
         window: &mut Window,
         cx: &mut App,
     ) {
-        CommitView::open(
-            commit_sha.to_string(),
-            repository.clone(),
-            workspace.clone(),
-            None,
-            Some(self.repo_path.clone()),
-            window,
             cx,
         );
     }
@@ -276,7 +269,7 @@ impl ChangedFileEntry {
                             .w_full()
                             .gap_1()
                             .overflow_hidden()
-                            .child(git_status_icon(self.status))
+                            
                             .child(
                                 Label::new(file_name.clone())
                                     .size(LabelSize::Small)
@@ -391,7 +384,6 @@ actions!(
         /// Copies a tag from the selected commit to the clipboard.
         CopyCommitTag,
         /// Opens the commit view for the selected commit.
-        OpenCommitView,
         /// Focuses the search field.
         FocusSearch,
         /// Focuses the next git graph tab stop.
@@ -881,65 +873,6 @@ pub fn init(cx: &mut App) {
                     })
                 },
             )
-            .when(
-                workspace.project().read(cx).active_repository(cx).is_some(),
-                |div| {
-                    let workspace = workspace.weak_handle();
-
-                    div.on_action({
-                        let workspace = workspace.clone();
-                        move |_: &git_ui::git_panel::Open, window, cx| {
-                            workspace
-                                .update(cx, |workspace, cx| {
-                                    let Some(repo) =
-                                        workspace.project().read(cx).active_repository(cx)
-                                    else {
-                                        return;
-                                    };
-                                    let selected_repo_id = repo.read(cx).id;
-
-                                    let git_store =
-                                        workspace.project().read(cx).git_store().clone();
-                                    open_or_reuse_graph(
-                                        workspace,
-                                        selected_repo_id,
-                                        git_store,
-                                        LogSource::All,
-                                        None,
-                                        window,
-                                        cx,
-                                    );
-                                })
-                                .ok();
-                        }
-                    })
-                    .on_action(
-                        move |action: &git_ui::git_panel::OpenAtCommit, window, cx| {
-                            let sha = action.sha.clone();
-                            workspace
-                                .update(cx, |workspace, cx| {
-                                    let Some(repo) =
-                                        workspace.project().read(cx).active_repository(cx)
-                                    else {
-                                        return;
-                                    };
-                                    let selected_repo_id = repo.read(cx).id;
-
-                                    let git_store =
-                                        workspace.project().read(cx).git_store().clone();
-                                    open_or_reuse_graph(
-                                        workspace,
-                                        selected_repo_id,
-                                        git_store,
-                                        LogSource::All,
-                                        Some(sha),
-                                        window,
-                                        cx,
-                                    );
-                                })
-                                .ok();
-                        },
-                    )
                 },
             )
         });
@@ -966,13 +899,6 @@ fn resolve_file_history_target(
             LogSource::Path(repo_path)
         };
         return Some((repo.read(cx).id, log_source));
-    }
-
-    if let Some(panel) = workspace.panel::<git_ui::git_panel::GitPanel>(cx)
-        && panel.read(cx).focus_handle(cx).contains_focused(window, cx)
-        && let Some((repository, repo_path)) = panel.read(cx).selected_file_history_target()
-    {
-        return Some((repository.read(cx).id, LogSource::Path(repo_path)));
     }
 
     let editor = workspace.active_item_as::<Editor>(cx)?;
@@ -1967,13 +1893,6 @@ impl GitGraph {
             return;
         };
 
-        CommitView::open(
-            commit_entry.data.sha.to_string(),
-            repository.downgrade(),
-            self.workspace.clone(),
-            None,
-            None,
-            window,
             cx,
         );
     }
@@ -2137,7 +2056,7 @@ impl GitGraph {
                 .header(format!("Commit {sha_short}"))
                 .entry(
                     "View Commit",
-                    Some(OpenCommitView.boxed_clone()),
+                    None,
                     window.handler_for(&git_graph, move |this, window, cx| {
                         this.open_commit_view(index, window, cx);
                     }),
@@ -2501,9 +2420,7 @@ impl GitGraph {
                 Some(author_email.clone())
             };
 
-            CommitAvatar::new(&full_sha, author_email_for_avatar, remote.as_ref())
-                .size(px(40.))
-                .render(window, cx)
+            div().size(px(40.)).bg(cx.theme().colors().element_background).into_any_element()
         };
 
         let changed_files_count = self
@@ -3550,7 +3467,6 @@ impl Render for GitGraph {
             .track_focus(&self.focus_handle)
             .size_full()
             .bg(cx.theme().colors().editor_background)
-            .on_action(cx.listener(|this, _: &OpenCommitView, window, cx| {
                 this.open_selected_commit_view(window, cx);
             }))
             .on_action(cx.listener(Self::copy_selected_commit_sha))
@@ -4178,7 +4094,7 @@ mod tests {
             cx.set_global(settings_store);
             theme_settings::init(theme::LoadThemes::JustBase, cx);
             language_model::init(cx);
-            git_ui::init(cx);
+            
             project_panel::init(cx);
             init(cx);
         });
@@ -5094,14 +5010,7 @@ mod tests {
                 async_window_cx.clone(),
             ))
             .expect("project panel should load");
-        let git_panel = cx
-            .foreground_executor()
-            .clone()
-            .block_test(git_ui::git_panel::GitPanel::load(
-                weak_workspace,
-                async_window_cx,
-            ))
-            .expect("git panel should load");
+        
         cx.background_executor.forbid_parking();
 
         workspace_window
@@ -5109,7 +5018,7 @@ mod tests {
                 let workspace = multi.workspace();
                 workspace.update(cx, |workspace, cx| {
                     workspace.add_panel(project_panel.clone(), window, cx);
-                    workspace.add_panel(git_panel.clone(), window, cx);
+                    
                 });
             })
             .expect("workspace window should be available");
@@ -5143,33 +5052,7 @@ mod tests {
             );
         });
 
-        workspace_window
-            .update(cx, |multi, window, cx| {
-                let workspace = multi.workspace();
-                git_panel.update(cx, |panel, cx| {
-                    panel.select_entry_by_path(tracked1.clone(), window, cx);
-                });
-                workspace.update(cx, |workspace, cx| {
-                    workspace.focus_panel::<git_ui::git_panel::GitPanel>(window, cx);
-                });
-            })
-            .expect("workspace window should be available");
-        cx.run_until_parked();
-        workspace_window
-            .update(cx, |_, window, cx| {
-                window.dispatch_action(Box::new(git::FileHistory), cx);
-            })
-            .expect("workspace window should be available");
-        cx.run_until_parked();
-
-        workspace.read_with(cx, |workspace, cx| {
-            let graphs = workspace.items_of_type::<GitGraph>(cx).collect::<Vec<_>>();
-            assert_eq!(graphs.len(), 1);
-            assert_eq!(
-                graphs[0].read(cx).log_source,
-                LogSource::Path(tracked1_repo_path.clone())
-            );
-        });
+        
 
         let tracked1_buffer = project
             .update(cx, |project, cx| project.open_buffer(tracked1.clone(), cx))

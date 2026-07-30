@@ -1,0 +1,28 @@
+[package]
+name = "gitbutler_store"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+
+[lib]
+path = "src/gitbutler_store.rs"
+
+[features]
+test-support = []
+
+[dependencies]
+anyhow.workspace = true
+tokio.workspace = true
+gpui.workspace = true
+but-ctx.workspace = true
+but-workspace.workspace = true
+but-graph.workspace = true
+but-api.workspace = true
+but-db.workspace = true
+but-core.workspace = true
+but-rebase.workspace = true
+gix.workspace = true
+gitbutler_bridge.workspace = true
+but-hunk-assignment.workspace = true
+gitbutler-git = { path = "../../../gitbutler/crates/gitbutler-git" }
+gitbutler_watcher = { version = "0.1.0", path = "../gitbutler_watcher" }

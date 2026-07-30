@@ -27,6 +27,8 @@ accepted = [
     "Zlib",
     "BSL-1.0",
     "bzip2-1.0.6",
+    "CDLA-Permissive-2.0",
+    "GPL-3.0-or-later",
 ]
 
 [procinfo.clarify]

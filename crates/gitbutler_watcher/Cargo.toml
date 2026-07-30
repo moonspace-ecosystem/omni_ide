@@ -1,0 +1,11 @@
+[package]
+name = "gitbutler_watcher"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+
+[dependencies]
+gpui.workspace = true
+notify = "6.1.1"
+tokio = { workspace = true, features = ["sync", "time"] }
+anyhow = { workspace = true }

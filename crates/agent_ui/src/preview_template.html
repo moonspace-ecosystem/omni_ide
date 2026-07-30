@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omni Design Preview</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { margin: 0; font-family: 'Inter', system-ui, sans-serif; background: #1a1a2e; color: #eee; }
+        .placeholder {
+            display: flex; align-items: center; justify-content: center;
+            height: 100vh; flex-direction: column; gap: 1rem; opacity: 0.6;
+        }
+        .placeholder h1 { font-size: 1.5rem; font-weight: 600; }
+        .placeholder p { font-size: 0.875rem; color: #888; }
+    </style>
+</head>
+<body>
+    <div id="root">
+        <div class="placeholder">
+            <h1>Omni Design Preview</h1>
+            <p>Waiting for component from Agent...</p>
+        </div>
+    </div>
+    <script>
+        const ws = new WebSocket(`ws://${window.location.host}/ws`);
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            if (data.type === 'hmr') {
+                document.getElementById('root').innerHTML = data.html;
+            }
+        };
+        ws.onclose = () => {
+            console.log('[Omni Design] WebSocket closed. Reconnecting in 2s...');
+            setTimeout(() => location.reload(), 2000);
+        };
+    </script>
+</body>
+</html>
